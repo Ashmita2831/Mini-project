@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_PROCESSES 10
+
+
+struct Process {
+    int pid;       
+    int burstTime; 
+    int remainingTime; 
+};
+
+void roundRobin(struct Process processes[], int n, int timeQuantum) {
+    int completed = 0;
+    int time = 0;
+    int i;
+
+   
+    printf("\n%-10s%-15s%-25s%-15s%-30s\n", "PID", "Burst Time", "Remaining Time", "Time Passed", "Remaining Time");
+    printf("%-10s%-15s%-25s%-15s%-30s\n", "", "", "Before Execution", "", "After Execution");
+
+    
+    while (completed < n) {
+        for (i = 0; i < n; i++) {
+            if (processes[i].remainingTime > 0) {
+               
+                int execTime = (processes[i].remainingTime > timeQuantum) ? timeQuantum : processes[i].remainingTime;
+                processes[i].remainingTime -= execTime;
+                time += execTime;
+
+                printf("%-10d%-15d%-25d%-15d%-30d\n", processes[i].pid, processes[i].burstTime,
+                    processes[i].remainingTime + execTime, execTime, processes[i].remainingTime);
+
+                if (processes[i].remainingTime == 0) {
+                    completed++;
+                }
+            }
+        }
+    }
+
+    printf("\nAll processes completed.\n");
+}
+
+int main() {
+    struct Process processes[MAX_PROCESSES];
+    int n, i, timeQuantum;
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    printf("Enter time quantum: ");
+    scanf("%d", &timeQuantum);
+
+
+    for (i = 0; i < n; i++) {
+        printf("Enter burst time for process %d: ", i + 1);
+        processes[i].pid = i + 1;
+        scanf("%d", &processes[i].burstTime);
+        processes[i].remainingTime = processes[i].burstTime;
+    }
+
+    roundRobin(processes, n, timeQuantum);
+
+    return 0;
+}
